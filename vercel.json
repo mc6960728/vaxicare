@@ -1,5 +1,7 @@
 {
   "version": 2,
+  "buildCommand": "npm run prisma:generate && npm run build",
+  "outputDirectory": "dist",
   "build": {
     "env": {
       "TS_NODE_TRANSPILE_ONLY": "true"

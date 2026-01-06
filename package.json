@@ -5,8 +5,8 @@
   "main": "dist/server.js",
   "scripts": {
     "dev": "tsx watch src/server.ts",
-    "build": "echo 'skip build on vercel'",
-    "vercel-build": "prisma generate",
+    "build": "tsc -p tsconfig.build.json",
+    "vercel-build": "tsc -p tsconfig.build.json",
     "build:strict": "tsc",
     "build:show-errors": "tsc || true",
     "start": "node dist/server.js",
