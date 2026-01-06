@@ -2,7 +2,9 @@
   "compilerOptions": {
     "target": "ES2022",
     "module": "commonjs",
-    "lib": ["ES2022"],
+    "lib": [
+      "ES2022"
+    ],
     "outDir": "./dist",
     "rootDir": "./src",
     "strict": true,
@@ -28,21 +30,39 @@
     "allowJs": false,
     "checkJs": false,
     "noErrorTruncation": false,
-    "types": ["node"],
+    "types": [
+      "node"
+    ],
     "baseUrl": "./src",
     "paths": {
-      "@controllers/*": ["controllers/*"],
-      "@services/*": ["services/*"],
-      "@middleware/*": ["middleware/*"],
-      "@utils/*": ["utils/*"],
-      "@config/*": ["config/*"],
-      "@types/*": ["types/*"],
-      "@routes/*": ["routes/*"]
+      "@controllers/*": [
+        "controllers/*"
+      ],
+      "@services/*": [
+        "services/*"
+      ],
+      "@middleware/*": [
+        "middleware/*"
+      ],
+      "@utils/*": [
+        "utils/*"
+      ],
+      "@config/*": [
+        "config/*"
+      ],
+      "@types/*": [
+        "types/*"
+      ],
+      "@routes/*": [
+        "routes/*"
+      ]
     }
   },
   "ts-node": {
     "transpileOnly": true,
     "compilerOptions": {
+      "noEmitOnError": false,
+      "skipLibCheck": true,
       "module": "commonjs"
     }
   },

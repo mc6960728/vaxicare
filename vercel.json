@@ -1,5 +1,10 @@
 {
   "version": 2,
+  "build": {
+    "env": {
+      "TS_NODE_TRANSPILE_ONLY": "true"
+    }
+  },
   "builds": [
     {
       "src": "src/server.ts",
