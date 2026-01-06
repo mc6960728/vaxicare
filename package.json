@@ -6,6 +6,9 @@
   "scripts": {
     "dev": "tsx watch src/server.ts",
     "build": "node build.js",
+    "vercel-build": "prisma generate",
+    "build:strict": "tsc",
+    "build:show-errors": "tsc || true",
     "start": "node dist/server.js",
     "pm2:start": "pm2 start ecosystem.config.js",
     "pm2:restart": "pm2 restart vaxicare-backend-nodejs",
