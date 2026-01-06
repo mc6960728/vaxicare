@@ -1,0 +1,820 @@
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "rhel-openssl-1.1.x"]
+}
+
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model Admin {
+  id                     String           @id @default(dbgenerated("gen_random_uuid()"))
+  email                  String           @unique
+  password               String
+  firstName              String
+  lastName               String
+  phone                  String?
+  role                   AdminRole        @default(ADMIN)
+  permissions            Json?
+  passwordResetToken     String?
+  passwordResetExpiresAt DateTime?
+  fcmToken               String?
+  deviceType             String?
+  status                 UserStatus       @default(ACTIVE)
+  isDeleted              Boolean          @default(false)
+  deletedAt              DateTime?
+  lastLoginAt            DateTime?
+  createdAt              DateTime         @default(now())
+  updatedAt              DateTime         @updatedAt
+  tokenBlacklist         TokenBlacklist[]
+
+  @@index([email])
+  @@index([role])
+  @@index([status])
+  @@index([isDeleted])
+  @@index([createdAt(sort: Desc)])
+  @@map("admins")
+}
+
+model User {
+  id           String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  fullName     String     @db.VarChar(255)
+  email        String     @unique @db.VarChar(255)
+  password     String     @db.VarChar(255)
+  phone        String?    @db.VarChar(50)
+  profilePhoto String?
+  role         UserRole   @default(ADMIN)
+  status       UserStatus @default(ACTIVE)
+  isDeleted    Boolean    @default(false)
+  deletedAt    DateTime?  @db.Timestamp(6)
+  lastLoginAt  DateTime?  @db.Timestamp(6)
+  createdAt    DateTime   @default(now()) @db.Timestamp(6)
+  updatedAt    DateTime   @default(now()) @updatedAt @db.Timestamp(6)
+
+  @@index([email])
+  @@index([role])
+  @@index([status])
+  @@index([isDeleted])
+  @@index([createdAt(sort: Desc)])
+  @@map("users")
+}
+
+model MedicalStaff {
+  id                     String              @id @default(dbgenerated("gen_random_uuid()"))
+  email                  String              @unique
+  password               String
+  passwordResetToken     String?
+  passwordResetExpiresAt DateTime?
+  firstName              String
+  lastName               String
+  fullName               String?
+  dialCode               String              @default("+91")
+  phone                  String              @unique
+  dateOfBirth            DateTime?
+  gender                 Gender?
+  profilePhoto           String?
+  address                String?
+  emergencyContactName   String?
+  emergencyContactPhone  String?
+  emailVerified          Boolean             @default(false)
+  phoneVerified          Boolean             @default(false)
+  fcmToken               String?
+  deviceType             String?
+  status                 UserStatus          @default(ACTIVE)
+  isDeleted              Boolean             @default(false)
+  deletedAt              DateTime?
+  lastLoginAt            DateTime?
+  role                   StaffRole
+  specialization         String?
+  department             String?
+  licenseNumber          String              @unique
+  licenseExpiryDate      DateTime?
+  experienceYears        Int?
+  qualifications         String?
+  clinicId               String?             @default("18a64bfd-f085-48c2-b9d9-7a27c3c6fcb8")
+  joiningDate            DateTime?
+  salary                 Decimal?            @db.Decimal(10, 2)
+  workingHours           String?
+  currentShift           String?
+  medicalHistory         String?
+  notes                  String?
+  employmentStatus       EmploymentStatus    @default(ACTIVE)
+  createdAt              DateTime            @default(now())
+  updatedAt              DateTime            @updatedAt
+  appointments           Appointment[]
+  vaccinationCenter      VaccinationCenter?  @relation(fields: [clinicId], references: [id])
+  stockRequests          StockRequest[]
+  tokenBlacklist         TokenBlacklist[]
+  vaccinationRecords     VaccinationRecord[]
+
+  @@index([email])
+  @@index([phone])
+  @@index([clinicId])
+  @@index([licenseNumber])
+  @@index([role])
+  @@index([department])
+  @@index([employmentStatus])
+  @@index([status])
+  @@index([isDeleted])
+  @@index([createdAt(sort: Desc)])
+  @@map("medical_staff")
+}
+
+model Parent {
+  id                     String           @id @default(dbgenerated("gen_random_uuid()"))
+  fullName               String
+  dialCode               String           @default("+91")
+  phone                  String           @unique
+  email                  String           @unique
+  relationWithChild      String
+  profilePhoto           String?
+  password               String
+  passwordResetToken     String?
+  passwordResetExpiresAt DateTime?
+  phoneVerified          Boolean          @default(false)
+  emailVerified          Boolean          @default(false)
+  fcmToken               String?
+  deviceType             String?
+  status                 UserStatus       @default(ACTIVE)
+  isDeleted              Boolean          @default(false)
+  lastLoginAt            DateTime?
+  createdAt              DateTime         @default(now())
+  updatedAt              DateTime         @updatedAt
+  deletedAt              DateTime?        @db.Timestamp(6)
+  age                    Int?
+  dateOfBirth            DateTime?        @db.Timestamp(6)
+  gender                 Gender?
+  bloodGroup             BloodGroup?
+  numberOfChildren       Int?
+  address                String?
+  city                   String?          @db.VarChar(255)
+  state                  String?          @db.VarChar(255)
+  pincode                String?          @db.VarChar(20)
+  emergencyContactName   String?          @db.VarChar(255)
+  emergencyContactPhone  String?          @db.VarChar(50)
+  registrationDate       DateTime?        @db.Timestamp(6)
+  registrationTime       String?          @db.VarChar(20)
+  lastVisitDate          DateTime?        @db.Timestamp(6)
+  lastVisitTime          String?          @db.VarChar(20)
+  medicalHistory         String?
+  notes                  String?
+  appointments           Appointment[]
+  children               Child[]
+  tokenBlacklist         TokenBlacklist[]
+
+  @@index([email])
+  @@index([phone])
+  @@index([status])
+  @@index([createdAt(sort: Desc)])
+  @@map("parents")
+}
+
+model Child {
+  id                 String              @id @default(dbgenerated("gen_random_uuid()"))
+  parentId           String
+  name               String              @default("")
+  dateOfBirth        DateTime
+  gender             Gender
+  profilePhoto       String?
+  weightKg           Decimal?            @db.Decimal(5, 2)
+  heightCm           Decimal?            @db.Decimal(5, 2)
+  bloodGroup         BloodGroup?
+  allergies          String[]            @default([])
+  pediatrician       String?
+  medicalConditions  String[]            @default([])
+  specialNotes       String?
+  isActive           Boolean             @default(true)
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
+  appointments       Appointment[]
+  parent             Parent              @relation(fields: [parentId], references: [id], onDelete: Cascade)
+  vaccinationRecords VaccinationRecord[]
+
+  @@index([parentId])
+  @@index([dateOfBirth])
+  @@index([createdAt(sort: Desc)])
+  @@map("children")
+}
+
+model District {
+  id                 String              @id @default(dbgenerated("gen_random_uuid()"))
+  name               String
+  state              String              @default("Gujarat")
+  districtCode       String              @unique
+  status             LocationStatus      @default(ACTIVE)
+  notes              String?
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
+  contactPerson      String?
+  phone              String?
+  email              String?
+  officeAddress      String?
+  talukas            Taluka[]
+  vaccinationCenters VaccinationCenter[]
+  villages           Village[]
+
+  @@index([districtCode])
+  @@index([status])
+  @@index([createdAt(sort: Desc)])
+  @@map("districts")
+}
+
+model Taluka {
+  id                 String              @id @default(dbgenerated("gen_random_uuid()"))
+  name               String
+  districtId         String
+  talukaCode         String              @unique
+  status             LocationStatus      @default(ACTIVE)
+  notes              String?
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
+  contactPerson      String?
+  phone              String?
+  email              String?
+  officeAddress      String?
+  district           District            @relation(fields: [districtId], references: [id], onDelete: Cascade)
+  vaccinationCenters VaccinationCenter[]
+  villages           Village[]
+
+  @@index([districtId])
+  @@index([talukaCode])
+  @@index([status])
+  @@index([createdAt(sort: Desc)])
+  @@map("talukas")
+}
+
+model Village {
+  id                 String              @id @default(dbgenerated("gen_random_uuid()"))
+  name               String
+  talukaId           String
+  districtId         String
+  status             LocationStatus      @default(ACTIVE)
+  notes              String?
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
+  contactPerson      String?
+  phone              String?
+  email              String?
+  officeAddress      String?
+  vaccinationCenters VaccinationCenter[]
+  district           District            @relation(fields: [districtId], references: [id], onDelete: Cascade)
+  taluka             Taluka              @relation(fields: [talukaId], references: [id], onDelete: Cascade)
+
+  @@index([talukaId])
+  @@index([districtId])
+  @@index([status])
+  @@index([createdAt(sort: Desc)])
+  @@map("villages")
+}
+
+model VaccinationCenter {
+  id                 String              @id @default(dbgenerated("gen_random_uuid()"))
+  name               String
+  address            String?
+  pincode            String?
+  phone              String?
+  email              String?
+  licenseNumber      String              @unique
+  openingHours       String?
+  facilities         String?
+  isActive           Boolean             @default(true)
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
+  districtId         String?
+  talukaId           String?
+  villageId          String?
+  appointments       Appointment[]
+  medicalStaff       MedicalStaff[]
+  stockRequests      StockRequest[]
+  district           District?           @relation(fields: [districtId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  taluka             Taluka?             @relation(fields: [talukaId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  village            Village?            @relation(fields: [villageId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  vaccinationRecords VaccinationRecord[]
+  outgoingTransfers  VaccineTransfer[]   @relation("FromCenter")
+  incomingTransfers  VaccineTransfer[]   @relation("ToCenter")
+  vaccineInventory   VaccineInventory[]
+
+  @@index([districtId])
+  @@index([talukaId])
+  @@index([villageId])
+  @@index([isActive])
+  @@index([createdAt(sort: Desc)])
+  @@map("vaccination_centers")
+}
+
+model Vaccine {
+  id                   String              @id @default(dbgenerated("gen_random_uuid()"))
+  name                 String
+  description          String?
+  dosage               String?
+  ageGroupLabel        String?
+  dosageCount          Int                 @default(1)
+  intervalBetweenDoses Int?
+  sideEffects          String?
+  notes                String?
+  isActive             Boolean             @default(true)
+  createdAt            DateTime            @default(now())
+  updatedAt            DateTime            @updatedAt
+  batchNumber          String?
+  vaccineType          VaccineType?        @default(INJECTABLE)
+  vialType             VialType?           @default(SINGLE_DOSE)
+  supplierId           String?             @default("f44ab9ce-953b-4128-9211-01b7a6ec963a") @db.VarChar(255)
+  dosageUnits          String?             @db.VarChar
+  dosagePerVial        Decimal?            @db.Decimal
+  dosagePerChild       Decimal?            @db.Decimal
+  childrenPerVial      Decimal?            @db.Decimal
+  storageLocation      String?             @db.VarChar
+  storageCondition     String?             @db.VarChar
+  lastTemperatureCheck String?             @db.VarChar
+  temperature          String?             @db.VarChar
+  vaccineCode          String?             @unique @db.VarChar
+  administrationRoute  VaccineRouteType?   @default(ORAL)
+  appointments         Appointment[]
+  vaccinationRecords   VaccinationRecord[]
+  vaccineTransfers     VaccineTransfer[]
+  inventory            VaccineInventory[]
+  schedules            VaccineSchedule[]
+  manufacturer         Supplier?           @relation(fields: [supplierId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "vaccine_supplier_fkey")
+
+  @@index([name])
+  @@index([isActive])
+  @@index([ageGroupLabel])
+  @@index([createdAt(sort: Desc)])
+  @@index([description])
+  @@index([supplierId])
+  @@map("vaccines")
+}
+
+model VaccineInventory {
+  id                 String            @id @default(dbgenerated("gen_random_uuid()"))
+  vaccineId          String
+  clinicId           String
+  batchNumber        String
+  quantity           Int
+  costPerUnit        Decimal?          @db.Decimal(10, 2)
+  manufacturingDate  DateTime?
+  expiryDate         DateTime
+  supplier           String?
+  storageLocation    String?
+  temperature        String?
+  status             InventoryStatus   @default(ACTIVE)
+  notes              String?
+  receivedDate       DateTime          @default(now())
+  createdAt          DateTime          @default(now())
+  updatedAt          DateTime          @updatedAt
+  supplierId         String?
+  dosesInVial        Int?
+  totalDoses         Int?
+  remainingDoses     Int?
+  remainingFullVials Int?
+  openVialDoses      Int?
+  appointments       Appointment[]
+  vaccinationCenter  VaccinationCenter @relation(fields: [clinicId], references: [id], onDelete: Cascade)
+  manufacturer       Supplier?         @relation(fields: [supplierId], references: [id], onDelete: Cascade)
+  vaccine            Vaccine           @relation(fields: [vaccineId], references: [id], onDelete: Cascade)
+
+  @@index([vaccineId])
+  @@index([clinicId])
+  @@index([expiryDate])
+  @@index([batchNumber])
+  @@index([status])
+  @@index([createdAt(sort: Desc)])
+  @@map("vaccine_inventory")
+}
+
+model Supplier {
+  id                   String             @id @default(dbgenerated("gen_random_uuid()"))
+  supplierName         String
+  supplierCode         String             @unique
+  fullName             String
+  phone                String
+  email                String             @unique
+  website              String?
+  rating               String?
+  status               InventoryStatus    @default(ACTIVE)
+  address              String?
+  city                 String
+  state                String
+  country              String             @default("India")
+  pincode              String?
+  gstNumber            String?
+  taxIdNumber          String?
+  licenseNumber        String?
+  licenseExpiryDate    DateTime?
+  bankName             String?
+  bankBranch           String?
+  accountType          String?
+  accountNumber        String?
+  ifscCode             String?
+  creditLimit          Decimal?           @db.Decimal(12, 2)
+  totalOrders          Int?               @default(0)
+  totalOrderValue      Decimal?           @default(0) @db.Decimal(12, 2)
+  lastOrderDate        DateTime?
+  notes                String?
+  vaccineType          String?
+  vaccineSupplied      String?
+  temperature          String?
+  maxSupplyCapacity    String?
+  certification        String?
+  expiredStockHandling String?
+  createdAt            DateTime           @default(now())
+  updatedAt            DateTime           @updatedAt
+  paymentTerms         paymentTerms       @default(ADVANCE)
+  vaccineTransfers     VaccineTransfer[]
+  vaccineInventories   VaccineInventory[]
+  vaccines             Vaccine[]
+
+  @@index([supplierCode])
+  @@index([email])
+  @@index([status])
+  @@index([city])
+  @@index([state])
+  @@index([createdAt(sort: Desc)])
+  @@map("suppliers")
+}
+
+model Appointment {
+  id                   String             @id @default(dbgenerated("gen_random_uuid()"))
+  childId              String?
+  parentId             String
+  clinicId             String
+  vaccineId            String
+  medicalStaffId       String?
+  scheduledDate        DateTime
+  scheduledTime        String
+  status               AppointmentStatus  @default(SCHEDULED)
+  notes                String?
+  createdAt            DateTime           @default(now())
+  updatedAt            DateTime           @updatedAt
+  cancellationReason   String?
+  isParentAcknowledged Boolean            @default(false)
+  parentAcknowledgedAt DateTime?
+  verificationCode     String?
+  vaccineInventoryId   String?
+  child                Child?             @relation(fields: [childId], references: [id], onDelete: Cascade)
+  vaccinationCenter    VaccinationCenter  @relation(fields: [clinicId], references: [id], onDelete: Cascade)
+  medicalStaff         MedicalStaff?      @relation(fields: [medicalStaffId], references: [id])
+  parent               Parent             @relation(fields: [parentId], references: [id], onDelete: Cascade)
+  vaccine              Vaccine            @relation(fields: [vaccineId], references: [id])
+  vaccineInventory     VaccineInventory?  @relation(fields: [vaccineInventoryId], references: [id])
+  vaccinationRecord    VaccinationRecord?
+
+  @@index([childId])
+  @@index([parentId])
+  @@index([clinicId])
+  @@index([medicalStaffId])
+  @@index([scheduledDate])
+  @@index([status])
+  @@index([vaccineInventoryId])
+  @@index([createdAt(sort: Desc)])
+  @@index([vaccineId])
+  @@map("appointments")
+}
+
+model VaccinationRecord {
+  id                String             @id @default(dbgenerated("gen_random_uuid()"))
+  appointmentId     String?            @unique
+  childId           String
+  vaccineId         String
+  administeredBy    String?
+  administeredDate  DateTime
+  doseNumber        Int
+  batchNumber       String?
+  nextDueDate       DateTime?
+  reactions         String?
+  notes             String?
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+  clinicId          String?
+  medicalStaff      MedicalStaff?      @relation(fields: [administeredBy], references: [id])
+  appointment       Appointment?       @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
+  child             Child              @relation(fields: [childId], references: [id], onDelete: Cascade)
+  vaccinationCenter VaccinationCenter? @relation(fields: [clinicId], references: [id])
+  vaccine           Vaccine            @relation(fields: [vaccineId], references: [id])
+
+  @@index([childId])
+  @@index([vaccineId])
+  @@index([clinicId])
+  @@index([administeredBy])
+  @@index([administeredDate])
+  @@index([createdAt(sort: Desc)])
+  @@map("vaccination_records")
+}
+
+model VaccineTransfer {
+  id                    String              @id(map: "vaccine-transfer_pkey") @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  transferId            String              @unique(map: "vaccine-transfer_transferId_key")
+  transferStatus        DeliveryType?       @default(ORDERED)
+  invoiceNo             String?
+  vaccineId             String
+  batchNumber           String
+  temperatureAtDispatch String?
+  temperatureAtReceive  String?
+  packagingType         String?
+  quantityDispatched    Int
+  quantityReceived      Int?
+  quantityAccepted      Int?
+  quantityRejected      Int?
+  fromLocationId        String
+  toLocationId          String
+  dispatchedOn          DateTime            @default(now()) @db.Timestamp(6)
+  expectedDeliveryDate  DateTime?           @db.Timestamp(6)
+  expiryDate            DateTime?           @db.Timestamp(6)
+  manufacturingDate     DateTime?           @db.Timestamp(6)
+  price                 Decimal?            @db.Decimal(10, 2)
+  totalAmount           Decimal?            @db.Decimal(10, 2)
+  coldChainMaintained   Boolean             @default(false)
+  courierName           String?
+  trackingNumber        String?
+  storageCondition      String?
+  dispatchRemarks       String?
+  receivedOn            DateTime?           @db.Timestamp(6)
+  receivedBy            String?
+  qualityCheck          QualityCheckStatus? @default(PENDING)
+  receiveRemarks        String?
+  insepectedBy          String?
+  inspectedQualityCheck QualityCheckStatus? @default(PENDING)
+  insepectedRemarks     String?
+  insepectedOn          DateTime?           @db.Timestamp(6)
+  status                TransferStatus?     @default(DISPATCHED)
+  createdAt             DateTime            @default(now()) @db.Timestamp(6)
+  updatedAt             DateTime            @default(now()) @updatedAt @db.Timestamp(6)
+  supplierId            String?
+  fromLocation          VaccinationCenter   @relation("FromCenter", fields: [fromLocationId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "vaccineTransfers_fromLocation_fkey")
+  manufacturer          Supplier?           @relation(fields: [supplierId], references: [id], onDelete: Cascade, map: "vaccineTransfers_supplierId_fkey")
+  toLocation            VaccinationCenter   @relation("ToCenter", fields: [toLocationId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "vaccineTransfers_toLocation_fkey")
+  vaccine               Vaccine             @relation(fields: [vaccineId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "vaccineTransfers_vaccine_fkey")
+
+  @@index([fromLocationId, toLocationId], map: "vaccine-transfer_fromLocationId_toLocationId_idx")
+  @@index([vaccineId, batchNumber], map: "vaccine-transfer_vaccineId_batchNumber_idx")
+  @@index([createdAt(sort: Desc)])
+  @@map("vaccine-transfers")
+}
+
+model Otp {
+  id        String   @id @default(dbgenerated("gen_random_uuid()"))
+  dialCode  String   @default("+91")
+  phone     String
+  otp       String
+  expiresAt DateTime
+  verified  Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([phone])
+  @@index([expiresAt])
+  @@index([createdAt(sort: Desc)])
+  @@map("otps")
+}
+
+model TokenBlacklist {
+  id             String        @id @default(dbgenerated("gen_random_uuid()"))
+  token          String        @unique
+  adminId        String?
+  parentId       String?
+  medicalStaffId String?
+  userType       UserType
+  expiresAt      DateTime
+  createdAt      DateTime      @default(now())
+  admin          Admin?        @relation(fields: [adminId], references: [id], onDelete: Cascade)
+  medicalStaff   MedicalStaff? @relation(fields: [medicalStaffId], references: [id], onDelete: Cascade)
+  parent         Parent?       @relation(fields: [parentId], references: [id], onDelete: Cascade)
+
+  @@index([token])
+  @@index([adminId])
+  @@index([parentId])
+  @@index([medicalStaffId])
+  @@index([userType])
+  @@index([expiresAt])
+  @@map("token_blacklist")
+}
+
+model VaccineSchedule {
+  id            String   @id @default(dbgenerated("gen_random_uuid()"))
+  vaccineId     String
+  vaccineName   String
+  ageGroupLabel String
+  ageInDays     Int
+  ageInMonths   Int?
+  doseNumber    Int
+  displayOrder  Int
+  isRequired    Boolean  @default(true)
+  description   String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  vaccine       Vaccine  @relation(fields: [vaccineId], references: [id], onDelete: Cascade)
+
+  @@index([vaccineId])
+  @@index([ageInDays])
+  @@index([displayOrder])
+  @@index([createdAt(sort: Desc)])
+  @@map("vaccine_schedules")
+}
+
+model KnowledgeBase {
+  id          String   @id @default(dbgenerated("gen_random_uuid()"))
+  title       String
+  description String?
+  content     String
+  imageUrl    String?
+  category    String
+  isPublished Boolean  @default(true)
+  viewCount   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([category])
+  @@index([isPublished])
+  @@map("knowledge_base")
+}
+
+model StockRequest {
+  id                    String             @id @default(dbgenerated("gen_random_uuid()"))
+  requestedBy           String
+  clinicId              String
+  vaccineName           String
+  vaccineType           String?
+  quantity              Int
+  preferredDeliveryDate DateTime?
+  status                StockRequestStatus @default(PENDING)
+  adminNotes            String?
+  rejectionReason       String?
+  approvedAt            DateTime?
+  rejectedAt            DateTime?
+  fulfilledAt           DateTime?
+  createdAt             DateTime           @default(now())
+  updatedAt             DateTime           @updatedAt
+  vaccinationCenter     VaccinationCenter  @relation(fields: [clinicId], references: [id], onDelete: Cascade)
+  medicalStaff          MedicalStaff       @relation(fields: [requestedBy], references: [id], onDelete: Cascade)
+
+  @@index([requestedBy])
+  @@index([clinicId])
+  @@index([status])
+  @@index([createdAt])
+  @@map("stock_requests")
+}
+
+model migrations {
+  id          Int       @id @default(dbgenerated("nextval('_migrations_id_seq'::regclass)"))
+  name        String    @unique @db.VarChar(255)
+  executed_at DateTime? @default(now()) @db.Timestamp(6)
+
+  @@map("_migrations")
+}
+
+enum AdminRole {
+  SUPER_ADMIN
+  ADMIN
+}
+
+enum UserRole {
+  SUPER_ADMIN
+  ADMIN
+}
+
+enum UserType {
+  ADMIN
+  PARENT
+  MEDICAL_STAFF
+}
+
+enum StaffRole {
+  DOCTOR
+  NURSE
+  PHARMACIST
+  LAB_TECHNICIAN
+  ADMINISTRATOR
+  RECEPTIONIST
+}
+
+enum EmploymentStatus {
+  ACTIVE
+  ON_LEAVE
+  RESIGNED
+  TERMINATED
+  RETIRED
+}
+
+enum UserStatus {
+  ACTIVE
+  INACTIVE
+  SUSPENDED
+  DELETED
+}
+
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+}
+
+enum BloodGroup {
+  A_POSITIVE
+  A_NEGATIVE
+  B_POSITIVE
+  B_NEGATIVE
+  AB_POSITIVE
+  AB_NEGATIVE
+  O_POSITIVE
+  O_NEGATIVE
+}
+
+enum AppointmentStatus {
+  SCHEDULED
+  CONFIRMED
+  COMPLETED
+  CANCELLED
+  NO_SHOW
+  RESCHEDULED
+  START_VISIT
+  CHECK_IN
+  CHECK_OUT
+}
+
+enum LocationStatus {
+  ACTIVE
+  INACTIVE
+  PENDING
+}
+
+enum InventoryStatus {
+  ACTIVE
+  EXPIRED
+  LOW_STOCK
+  OUT_OF_STOCK
+  QUARANTINE
+}
+
+enum StockRequestStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  FULFILLED
+}
+
+enum paymentTerms {
+  ADVANCE
+  PAYMENT_ON_DELIVERY
+  LC
+  MILESTONE
+}
+
+enum TransferStatus {
+  DISPATCHED
+  IN_TRANSIT
+  RECEIVED
+  COMPLETED
+  CANCELLED
+}
+
+enum QualityCheckStatus {
+  PENDING
+  PASSED
+  FAILED
+}
+
+enum VaccineType {
+  ORAL_DROPS
+  INJECTABLE
+  ORAL_SOLUTION
+  NASAL_SPRAY
+}
+
+enum VialType {
+  SINGLE_DOSE
+  MULTI_DOSE
+  PRE_FILLED
+}
+
+enum VaccineRouteType {
+  ORAL
+  INTRAMUSCULAR
+  SUBCUTANEOUS
+  INTRADERMAL
+  NASAL
+}
+
+enum DeliveryType {
+  ORDERED
+  PACKED
+  DISPATCHED
+  IN_TRANSIT
+  ARRIVED
+}
+
+enum qualitycheckstatus {
+  PENDING
+  PASSED
+  FAILED
+}
+
+enum transferstatus {
+  DISPATCHED
+  IN_TRANSIT
+  RECEIVED
+  COMPLETED
+  CANCELLED
+}
