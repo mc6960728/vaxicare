@@ -36,6 +36,7 @@ export class UserController {
       const response: ApiResponse = {
         status: 'success',
         data: user,
+        message: ''
       };
       res.status(200).json(response);
     } catch (error) {
@@ -81,6 +82,7 @@ export class UserController {
         status: 'success',
         data: result.data,
         pagination: result.pagination,
+        message: 'Users fetched successfully'
       };
       res.status(200).json(response);
     } catch (error) {
@@ -95,6 +97,7 @@ export class UserController {
       const response: ApiResponse = {
         status: 'success',
         data: user,
+        message: 'Users fetched successfully'
       };
       res.status(200).json(response);
     } catch (error) {
@@ -109,6 +112,7 @@ export class UserController {
       const response: ApiResponse = {
         status: 'success',
         message: 'User deleted successfully',
+        data :{}
       };
       res.status(200).json(response);
     } catch (error) {

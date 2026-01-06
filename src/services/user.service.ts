@@ -11,12 +11,12 @@ interface RegisterInput {
   firstName?: string;
   lastName?: string;
   organization?: string;
-  role: string;
+  role?: string;
 }
 
 export class UserService {
   async register(data: RegisterInput) {
-    const { email, password, firstName, lastName, organization, role } = data;
+    const { email, password, firstName, lastName, organization, role = "SUPER_ADMIN" } = data;
 
     // Check if user already exists
     const existingUser = await prisma.user.findUnique({
@@ -36,15 +36,16 @@ export class UserService {
       data: {
         email,
         password: hashedPassword,
-        firstName,
-        lastName,
-        organization,
-        role
+        // firstName,
+        // lastName,
+        fullName: `${firstName} ${lastName}`
+        // organization,
+        // role
       },
       select: {
         id: true,
         email: true,
-        firstName: true,
+        fullName: true,
         role: true,
         createdAt: true,
       },
@@ -64,9 +65,9 @@ export class UserService {
       select: {
         id: true,
         email: true,
-        firstName: true,
-        lastName: true,
-        organization: true,
+        fullName: true,
+        // lastName: true,
+        // organization: true,
         role: true,
         createdAt: true,
         updatedAt: true,
@@ -128,9 +129,8 @@ export class UserService {
       select: {
         id: true,
         email: true,
-        firstName: true,
-        lastName: true,
-        organization: true,
+        fullName: true,
+        // organization: true,
         role: true,
         status: true,
         createdAt: true,
@@ -180,9 +180,8 @@ export class UserService {
       select: {
         id: true,
         email: true,
-        firstName: true,
-        lastName: true,
-        organization: true,
+        fullName: true,
+        // organization: true,
         role: true,
         createdAt: true,
         updatedAt: true,

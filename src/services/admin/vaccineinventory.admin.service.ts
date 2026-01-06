@@ -21,11 +21,12 @@ export class VaccineInventoryAdminService {
     temperature?: string;
     status?: InventoryStatus;
     notes?: string;
-    dosageInVial?: number;
+    dosesInVial?: number;
     totalDoses?: number;
     remainingFullVials?: number;
     remainingDoses?: number;
     openvialDoses?: number;
+
   }) {
     // Validate vaccine exists
     const vaccine = await prisma.vaccine.findUnique({
@@ -82,10 +83,10 @@ export class VaccineInventoryAdminService {
     }
 
     const quantity = data?.quantity
-    const dosageInVial = data?.dosageInVial
+    const dosesInVial = data?.dosesInVial
 
-    if (quantity && dosageInVial) {
-      data.totalDoses = quantity * dosageInVial
+    if (quantity && dosesInVial) {
+      data.totalDoses = quantity * dosesInVial
       data.remainingDoses = data.totalDoses
       data.remainingFullVials = quantity
       data.openvialDoses = 0

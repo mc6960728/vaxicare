@@ -400,7 +400,7 @@ export class VaccinationPlanService {
       vaccine: {
         id: schedule.vaccine.id,
         name: schedule.vaccine.name,
-        manufacturer: schedule.vaccine.manufacturer,
+        // manufacturer: schedule.vaccine.manufacturer,
         description: schedule.vaccine.description,
       },
       doseNumber: schedule.doseNumber,
@@ -424,7 +424,7 @@ export class VaccinationPlanService {
         vaccine: {
           id: schedule.vaccine.id,
           name: schedule.vaccine.name,
-          manufacturer: schedule.vaccine.manufacturer,
+          // manufacturer: schedule.vaccine.manufacturer,
           description: schedule.vaccine.description,
         },
         doseNumber: schedule.doseNumber,
@@ -464,7 +464,7 @@ export class VaccinationPlanService {
         vaccine: {
           id: record.vaccine.id,
           name: record.vaccine.name,
-          manufacturer: record.vaccine.manufacturer,
+          // manufacturer: record.vaccine.manufacturer,
           description: record.vaccine.description,
         },
         doseNumber: record.doseNumber,

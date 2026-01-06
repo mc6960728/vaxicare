@@ -459,7 +459,6 @@ export class VaccineService {
 
       // Meta
       isActive: vaccine.isActive,
-      price: vaccine.price,
     };
   }
 
@@ -509,22 +508,18 @@ export class VaccineService {
   async createVaccine(data: CreateVaccineInput) {
     // Check if vaccine already exists
 
-    const query = {
+    const query: any = {
       name: {
         equals: data.name,
-        mode: 'insensitive',
+        mode: 'insensitive' as const,
       },
-      // manufacturer: {
-      //   equals: data.manufacturer,
-      //   mode: 'insensitive',
-      // },};
     }
 
     if (data.supplierId) {
-      Object.assign(query, { supplierId: { equals: data.supplierId } })
+      query.supplierId = { equals: data.supplierId };
     }
     const existing = await prisma.vaccine.findFirst({
-      where: { ...query },
+      where: query,
     });
 
     if (existing) {
@@ -586,19 +581,15 @@ export class VaccineService {
     if (!existing) {
       throw new AppError('Vaccine not found', 404);
     }
-    const query = {
+    const query: any = {
       name: {
         equals: data.name,
-        mode: 'insensitive',
+        mode: 'insensitive' as const,
       },
-      // manufacturer: {
-      //   equals: data.manufacturer,
-      //   mode: 'insensitive',
-      // },};
     }
 
     if (data.supplierId) {
-      Object.assign(query, { supplierId: { equals: data.supplierId } })
+      query.supplierId = { equals: data.supplierId };
     }
     // If updating name/manufacturer, check for duplicates
     if (data.name || data.supplierId) {
@@ -606,7 +597,7 @@ export class VaccineService {
         where: {
           AND: [
             { id: { not: vaccineId } },
-            { ...query },
+            query,
             // {
             //   manufacturer: {
             //     equals: data.manufacturer || existing.manufacturer,

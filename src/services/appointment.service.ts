@@ -235,11 +235,12 @@ export class AppointmentService {
       }
 
       // 3. Check inventory (depends on vaccine.dosageCount from above)
+
       const inventoryRecord = await prisma.vaccineInventory.findFirst({
         where: {
           clinicId: data.clinicId,
           vaccineId: data.vaccineId,
-          quantity: { gte: vaccine.dosageCount },
+          remainingDoses: { gte: vaccine.dosageCount },
           expiryDate: { gt: data.scheduledDate },
         },
         select: { id: true }
@@ -252,7 +253,7 @@ export class AppointmentService {
       // 5. Generate 4-digit verification code
       const verificationCode = Math.floor(1000 + Math.random() * 9000).toString();
       const dataObject = {
-        child: {},
+        // childId: data.childId,
         // parentId: parentId,
         // clinicId: data.clinicId,
         // vaccineId: data.vaccineId,
@@ -267,8 +268,9 @@ export class AppointmentService {
         vaccinationCenter: { connect: { id: data.clinicId } },
         vaccine: { connect: { id: data.vaccineId } },
         medicalStaff: data.medicalStaffId ? { connect: { id: data.medicalStaffId } } : undefined,
+        child: data?.childId ? { connect: { id: data.childId } } : null
       }
-      if (data?.childId) dataObject.child = { connect: { id: data.childId } }
+      // if (data?.childId) dataObject.child = { connect: { id: data.childId } }
       // 6. Create appointment
       const appointment = await prisma.appointment.create({
         data: { ...dataObject },

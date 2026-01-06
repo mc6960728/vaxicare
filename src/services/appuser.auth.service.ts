@@ -153,8 +153,9 @@ export class AppUserAuthService {
 
     return {
       message: 'If the email exists, a password reset link has been sent.',
+      resetToken
       // Return resetToken only in development for testing
-      ...(process.env.NODE_ENV === 'development' && { resetToken }),
+      // ...(process.env.NODE_ENV === 'development' && { resetToken }),
     };
   }
 

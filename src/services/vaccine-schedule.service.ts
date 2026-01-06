@@ -60,7 +60,7 @@ export class VaccineScheduleService {
         vaccine: {
           id: schedule.vaccine.id,
           name: schedule.vaccine.name,
-          manufacturer: schedule.vaccine.manufacturer,
+          // manufacturer: schedule.vaccine.manufacturer,
           isActive: schedule.vaccine.isActive,
         },
       });
@@ -97,7 +97,7 @@ export class VaccineScheduleService {
       vaccine: {
         id: vaccine.id,
         name: vaccine.name,
-        manufacturer: vaccine.manufacturer,
+        // manufacturer: vaccine.manufacturer,
       },
       schedules,
     };
@@ -208,16 +208,16 @@ export class VaccineScheduleService {
     }
 
     // Check if there are any vaccination records using this schedule
-    const recordsCount = await prisma.vaccinationRecord.count({
-      where: { vaccineScheduleId: id },
-    });
+    // const recordsCount = await prisma.vaccinationRecord.count({
+    //   where: { vaccineScheduleId: id },
+    // });
 
-    if (recordsCount > 0) {
-      throw new AppError(
-        `Cannot delete schedule. ${recordsCount} vaccination record(s) are linked to this schedule`,
-        400
-      );
-    }
+    // if (recordsCount > 0) {
+    //   throw new AppError(
+    //     `Cannot delete schedule. ${recordsCount} vaccination record(s) are linked to this schedule`,
+    //     400
+    //   );
+    // }
 
     await prisma.vaccineSchedule.delete({
       where: { id },

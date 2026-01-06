@@ -12,7 +12,7 @@ interface LoginInput {
 }
 
 export class AuthService {
- 
+
   async login(data: LoginInput) {
     const { email, password } = data;
 
@@ -39,8 +39,8 @@ export class AuthService {
       user: {
         id: user.id,
         email: user.email,
-        firstName: user.firstName,
-        lastName: user.lastName,
+        firstName: user.fullName,
+        lastName: user.fullName,
         role: user.role,
       },
       token,
@@ -156,7 +156,7 @@ export class AuthService {
     await prisma.tokenBlacklist.create({
       data: {
         token,
-        userId,
+        userType: "MEDICAL_STAFF",
         expiresAt: new Date(decoded.exp * 1000), // Convert exp to milliseconds
       },
     });
@@ -175,8 +175,8 @@ export class AuthService {
   }
 
   private generateToken(userId: string, role: string): string {
-    return jwt.sign({ userId, role }, config.jwt.secret, {
-      expiresIn: config.jwt.expiresIn,
+    return jwt.sign({ userId, role }, process.env.JWT_SECRET, {
+      expiresIn: '24h',
     });
   }
 }

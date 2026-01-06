@@ -49,7 +49,7 @@ export class AdminAuthController {
       const response: ApiResponse = {
         status: 'success',
         message: result.message,
-        data: result.resetToken ? { resetToken: result.resetToken } : null,
+        data: result?.resetToken ? { resetToken: result.resetToken } : null,
       };
       res.status(200).json(response);
     } catch (error) {

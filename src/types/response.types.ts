@@ -3,9 +3,9 @@
  * Used for all successful API responses
  */
 export interface ApiResponse<T = any> {
-  status: 'success' | 'error';
-  message: string;
-  data: T;
+  status?: 'success' | 'error';
+  message?: string;
+  data?: T;
   pagination?: {
     page: number;
     limit: number;

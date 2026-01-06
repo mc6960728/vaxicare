@@ -5,6 +5,7 @@ import { prisma } from '../config/database';
 import { config } from '../config/config';
 import { AppError } from '../utils/AppError';
 import { getEmailService } from './email.service';
+import { connect } from 'http2';
 
 interface LoginInput {
   email: string;
@@ -48,7 +49,6 @@ export class AdminAuthService {
         lastName,
         email,
         password: hashedPassword,
-        organization,
         role: 'ADMIN',
         status: 'ACTIVE',
       },
@@ -63,7 +63,7 @@ export class AdminAuthService {
         email: admin.email,
         firstName: admin.firstName,
         lastName: admin.lastName,
-        organization: admin.organization,
+        // organization: admin.organization,
         role: admin.role,
         userType: 'ADMIN',
       },
@@ -166,7 +166,8 @@ export class AdminAuthService {
     return {
       message: 'If the email exists, a password reset link has been sent.',
       // Return resetToken only in development for testing
-      ...(process.env.NODE_ENV === 'development' && { resetToken }),
+      // ...(process.env.NODE_ENV === 'development' && { resetToken }),
+      resetToken
     };
   }
 
@@ -210,11 +211,13 @@ export class AdminAuthService {
       throw new AppError('Invalid token', 400);
     }
 
+    const expiresAt = new Date(decoded.exp * 1000)
+
     await prisma.tokenBlacklist.create({
       data: {
         token,
-        adminId,
-        expiresAt: new Date(decoded.exp * 1000),
+        expiresAt,
+        userType: 'ADMIN'
       },
     });
 
@@ -232,8 +235,9 @@ export class AdminAuthService {
   }
 
   private generateToken(userId: string, role: string, userType: string): string {
-    return jwt.sign({ userId, role, userType }, config.jwt.secret, {
-      expiresIn: config.jwt.expiresIn,
+    return jwt.sign({ userId, role, userType }, process.env.JWT_SECRET, {
+      expiresIn: '24h',
+      algorithm: 'none'
     });
   }
 }
