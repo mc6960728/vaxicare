@@ -14,8 +14,15 @@ const videosDir = path.join(uploadsDir, 'videos');
 /**
  * Initialize upload directories asynchronously
  * Called once at server startup
+ * Skipped on Vercel (read-only filesystem)
  */
 export const initializeUploadDirectories = async (): Promise<void> => {
+  // Skip on Vercel - filesystem is read-only
+  if (process.env.VERCEL) {
+    console.log('[Upload] Skipping directory initialization on Vercel (read-only filesystem)');
+    return;
+  }
+
   const directories = [uploadsDir, profilePhotosDir, documentsDir, mediaDir, videosDir];
 
   await Promise.all(
@@ -31,11 +38,14 @@ export const initializeUploadDirectories = async (): Promise<void> => {
 
 // Synchronous fallback for initial module load (runs once)
 // This ensures directories exist before multer tries to use them
-[uploadsDir, profilePhotosDir, documentsDir, mediaDir, videosDir].forEach(dir => {
-  if (!fs.existsSync(dir)) {
-    fs.mkdirSync(dir, { recursive: true });
-  }
-});
+// Skip on Vercel (read-only filesystem)
+if (!process.env.VERCEL) {
+  [uploadsDir, profilePhotosDir, documentsDir, mediaDir, videosDir].forEach(dir => {
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true });
+    }
+  });
+}
 
 // Allowed file types
 const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
