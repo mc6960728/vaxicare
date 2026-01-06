@@ -5,10 +5,7 @@
   "main": "dist/server.js",
   "scripts": {
     "dev": "tsx watch src/server.ts",
-    "build": "tsc -p tsconfig.build.json",
-    "vercel-build": "tsc -p tsconfig.build.json",
-    "build:strict": "tsc",
-    "build:show-errors": "tsc || true",
+    "build": "node build.js",
     "start": "node dist/server.js",
     "pm2:start": "pm2 start ecosystem.config.js",
     "pm2:restart": "pm2 restart vaxicare-backend-nodejs",
