@@ -11,5 +11,12 @@
       "src": "/(.*)",
       "dest": "src/server.ts"
     }
-  ]
+  ],
+  "functions": {
+    "src/server.ts": {
+      "memory": 1024,
+      "maxDuration": 10,
+      "regions": ["bom1"]
+    }
+  }
 }
