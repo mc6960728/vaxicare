@@ -252,7 +252,7 @@ export class AppointmentService {
       // 5. Generate 4-digit verification code
       const verificationCode = Math.floor(1000 + Math.random() * 9000).toString();
       const dataObject = {
-        // childId: data.childId,
+        child: {},
         // parentId: parentId,
         // clinicId: data.clinicId,
         // vaccineId: data.vaccineId,
@@ -942,7 +942,7 @@ export class AppointmentService {
               id: true,
               name: true,
               address: true,
-              city: true,
+              // city: true,
             },
           },
           vaccinationRecord: {
